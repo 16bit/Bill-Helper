@@ -208,10 +208,9 @@ BlankTable(n)
 
 Get(s)
 {
-	if(s = "BOL" or s = "PO" or s = "REF" or s = "Quantity" or s = "Description" or s = "Class" or s = "Weight")
-		msgbox,,, you know you cant use %s%
-	else
+	if(s != "BOL" or s != "PO" or s != "REF" or s != "Quantity" or s != "Description" or s != "Class" or s != "Weight")
 	{
+		ControlFocus,% %s%Field,Brain
 		ControlGetText,OutputVar,% %s%Field,Brain
 		return %OutputVar%		
 	}
@@ -219,12 +218,10 @@ Get(s)
 
 Set(s,x)
 {
-	if(s = "BOL" or s = "PO" or s = "REF" or s = "Quantity" or s = "Description" or s = "Class" or s = "Weight")
-		msgbox,,, you know you cant use %s%
-	else
+	if(s != "BOL" or s != "PO" or s != "REF" or s != "Quantity" or s != "Description" or s != "Class" or s != "Weight")
 	{
+		ControlFocus,% %s%Field,Brain
 		ControlSend,% %s%Field,^{BackSpace},Brain
-		sleep 50
 		ControlSend,% %s%Field,%x%,Brain
 	}
 }
@@ -586,22 +583,23 @@ Terms(n) ;This never seems to work, fix later
 }
 Shipper(n="")
 {
-	;~ if(n)
-		;~ Set("Shipper",n)
-	Select("Shipper")
+	;~ Select("Shipper")
 	
 	if(n)		;if I specified a specific account enter it
 	{
-		Delete()
-		Send %n%
-		;~ Send {Enter}
+		;~ Delete()
+		;~ Send %n%
+		Set("Shipper",n)
 	}
 	
-	if(!bIsBlank("Consignee"))
-		Send {Enter}	
-	else
-		Send {Enter}
-		CloseSearch()
+	if(!bIsBlank("Shipper"))				;If there is something in the shipper field
+	{
+		If(!bIsBlank("Consignee"))		;If the Consignee isn't blank, hit enter
+			Send {Enter}	
+		else											;Else make sure you close the search window that will pop up
+			Send {Enter}
+			CloseSearch()	
+	}
 }
 Consignee(n="")
 {

@@ -1,0 +1,3 @@
+Make Clear() clear everything using isBlank
+
+? Does close search need a wait timer
