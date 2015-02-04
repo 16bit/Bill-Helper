@@ -1,8 +1,11 @@
 CoordMode,Mouse,Screen
 CoordMode,Pixel,Screen
 SendMode, Input
-SysGet, MonitorWorkArea, MonitorWorkArea
 
+SetControlDelay, 0
+SetKeyDelay, 0
+SetMouseDelay, 0
+SetDefaultMouseSpeed, 100
 
 ;Get ready for a shit ton of variables
 global TestField := "WindowsForms10.EDIT.app.0.2bf8098_r13_ad18"
@@ -91,8 +94,6 @@ MoveSearch:
 WinMove, Consignee search,,1404,277 
 return
 
-
-
 ^!r::
 Reload  ; assigns Ctrl Alt r to reload scripts
 return
@@ -101,53 +102,7 @@ return
 ;~ BLANKTABLE(7)
 ;~ AddItem(1,ASKUSER("QUANTITY"),"SHEETS PILLOW CASES",100,COPY("TOTALWEIGHT"))
 ;~ AddItem(1,COPY("HU"),"NEWSPAPER",150,COPY("TOTALWEIGHT"))
-controlclick,"SftTreeControl32_U7",Brain,,left
 
-return
-
-^M::
-SLEEP 500
-IF(get("Shipper") = 1051382)
-	048L()
-
-IF(get("Shipper") = 0352084)
-	039TraneAberdeen()
-
-IF(get("Shipper") = 0994681)
-	048Esab()
-
-IF(get("Shipper") = 0491541)
-	100Air()
-
-IF(get("Shipper") = 0346627)
-	100Innovative()
-
-IF(get("Shipper") = 1070067)
-	048Tempur()
-
-IF(get("Shipper") = 0932392)
-	048Medical()
-
-IF(get("Shipper") = 0714361 || get("Shipper") = 0396949)
-	048CUI()
-
-IF(get("Shipper") = 0235682)
-	048Lindstrom()
-
-IF(get("Shipper") = 0507919 || get("Shipper") = 1253734)
-	039Ruskin()
-
-IF(get("Shipper") = 0339128)
-	048Gap()
-
-IF(get("Shipper") = 0589057)
-	100National()
-
-IF(get("Shipper") = 0591388)
-	100Stillwater()
-
-IF(get("Shipper") = 1358514)
-	100Paragon()
 
 return
 
@@ -156,22 +111,17 @@ TotalPieces(CalculateTotalPieces())
 return
 
 #s::
-MouseClick, LEFT, % A_CaretX,% A_CaretY,2
+MouseClick, LEFT,A_CaretX,A_CaretY,2
 return
-
-;Functions
 
 #c::
 addcode(ASKUSER("CODE?"))
 return
 
-^Q::
-{
-	WinWaitActive, Brainware Distiller Verifier [AVERITT\nferrell - VER] : [VerifierNF.set.dvs - bol.sdp], Cash / Certified Che
-	controlfocus, %QuoteField%, Brain
-	
-	RETURN
-}
+^q::
+controlfocus, %QuoteField%,A
+return
+
 
 CloseSearch(T=0.35)
 {
@@ -179,6 +129,7 @@ CloseSearch(T=0.35)
 	WinClose
 	WinWaitClose, Consignee search
 }
+
 DeleteLine(l = 1)
 {
 	send +^{D %l%}
@@ -195,29 +146,28 @@ Clear(S)
 }
 BlankTable(n)
 {
-	SendMode Event
-	MouseClick, left,  QuantityPos[1],  QuantityPos[2]
+	MouseClick,left,  QuantityPos[1] ,  QuantityPos[2]
 	Sleep, 100
-	send +^{D %n%}
-	send +^{A %n%}
-	SendMode Input
+	SendEvent +^{D %n%}
+	SendEvent +^{A %n%}
 }
 
 Get(s)
 {
 	if(s != "BOL" or s != "PO" or s != "REF" or s != "Quantity" or s != "Description" or s != "Class" or s != "Weight")
 	{
-		ControlGetText,OutputVar,% %s%Field,Brain
+		ControlGetText,OutputVar,% %s%Field,A
 		return OutputVar
 	}
 }
-
 Set(s,x)
 {
 	if(s != "BOL" or s != "PO" or s != "REF" or s != "Quantity" or s != "Description" or s != "Class" or s != "Weight")
 	{
-		ControlSend,% %s%Field,^{BackSpace},Brain
-		ControlSend,% %s%Field,%x%,Brain
+		;~ ControlFocus,% %s%Field,A
+		;~ ControlSend,% %s%Field,^{BackSpace},Brain
+		;~ ControlSend,% %s%Field,%x%,A
+		ControlSetText,% %s%Field, %x%,A
 	}
 }
 
@@ -226,9 +176,6 @@ Copy(s="",l=1)
 	clipboard=
 	if(s)
 	Select(s,l)
-	
-	if(s == "Consignee")
-	CloseSearch()	
 	
 	Send {Home}+{End}^c
 	ClipWait,.25
@@ -242,9 +189,6 @@ Delete(s="",l=1)
 {
 	if(s)
 	Select(s,l)
-	
-	if(s == "Consignee")
-	CloseSearch()	
 	
 	Send ^{Backspace}
 	
@@ -334,20 +278,20 @@ AddAddress()
 			FileAppend,
 			(
 			`n%Clipboard%,
-			),048TempurAddress.txt
+			),AddressBook.csv
 		}
 		else if (A_Index > 1 && A_Index < 8)
 		{	
 			FileAppend,
 			(
 			%Clipboard%,
-			),048TempurAddress.txt
+			),AddressBook.csv
 		}
 		else
 		FileAppend,		
 		(
 		%Clipboard%
-		),048TempurAddress.txt
+		),AddressBook.csv
 		
 		if A_Index = 2
 			send {Tab 2}
@@ -369,7 +313,7 @@ CalculateTotalPieces()
 		}
 		
 		else
-		return sum
+			return sum
 	}
 }
 Verify(s,n,l=1)
@@ -383,7 +327,7 @@ Verify(s,n,l=1)
 
 	if(NewStr)
 	{
-		if(StrLen(NewStr) < n)
+		if(StrLen(NewStr) < n)		;If String is less than n characters long
 		{
 			InputBox,input,Replace Field,%NewStr% looks a little small,,200,125,,,,,%NewStr%
 			if ErrorLevel = 0
@@ -397,12 +341,12 @@ Verify(s,n,l=1)
 		InputBox,input,Enter Field,Nothing detected,,200,125
 		if ErrorLevel = 0
 		if(input)
-		NewStr := input
+			NewStr := input
 	}		
 	
 	Send %NewStr%			
 }
-AskUser(s = "User Input",v = "")
+AskUser(s = "User Input",v = "")		;v is default value to display in input box
 {
 	InputBox,input,%s%,%s%,,200,125,500,200,,,%v%
 	WinWaitClose,%S%
@@ -455,20 +399,16 @@ bIsBlank(s="",l=1)
 		;If its in the table
 		if(s = "BOL" or s = "PO" or s = "REF" or s = "Quantity" or s = "Description" or s = "Class" or s = "Weight")
 		{
-			;~ Select(s,l)
-			;~ Copy()
-				
-			PixelSearch,Px,Py,	% %s%Pos[1] - %s%Width,		% %s%Pos[2] + (17 * (l - 1)) - 5,	% %s%Pos[1] ,		% %s%Pos[2] + (17 * (l - 1)), 0x000000,50,Fast
+			PixelSearch,Px,Py,	% %s%Pos[1] - %s%Width , % %s%Pos[2] + (17 * (l - 1)) - 5 , % %s%Pos[1] ,	 % %s%Pos[2] + (17 * (l - 1)) , 0x000000,50,Fast
 			if(Px)
 				Return false
 			else
 				return true
-		}
-		
-		;if its not in the table, get the control and look at that
-		else
+		}		
+
+		else			;if its not in the table, get the control and look at that
 		{
-			ControlGetText, OutputVar,% %s%Field, Brainware
+			ControlGetText, OutputVar,% %s%Field,A
 				if(OutputVar)
 					return false
 				else
@@ -476,8 +416,7 @@ bIsBlank(s="",l=1)
 		}
 	}
 	
-	;if there is no cell to look at, look around the caret which should be in a cell
-	else
+	else		;if there is no cell to look at, look around the caret which should be in a cell
 	{		
 		pixelsearch,PxRight,PyRight,(A_CaretX - 6),A_CaretY,(A_CaretX - 6) + 10,A_CaretY+10,0x000000,50,Fast
 		pixelsearch,PxLeft,PyLeft,(A_CaretX - 20),A_CaretY,(A_CaretX - 20) + 10,A_CaretY+10,0x000000,50,Fast
@@ -486,16 +425,10 @@ bIsBlank(s="",l=1)
 			return false
 		else
 			return true
-		
-		;~ if(clipboard)
-			;~ return FALSE
-		;~ else
-			;~ return TRUE
 	}		
 }
 bBottomofTable()	;Does a pixel search of the number column on the table, if it isn't white there is more below it.
 {
-
 	pixelsearch,Px,Py,1122,942,1124,944,0xF0F0F0,0,Fast
 	if(Px)
 		return true
@@ -505,23 +438,13 @@ bBottomofTable()	;Does a pixel search of the number column on the table, if it i
 FindBlankCell(s)
 {
 	MaxRows = 12 		;Number of rows on a single page, should always be 12 unless an update changes it.
-	;~ Select(s)
+	Select(s)
+
 	AddLine(1)
-	;~ Loop
-	;~ {
-		;~ if(!bIsBlank())
-		;~ {
-			;~ Send {Down}
-			;~ continue
-		;~ }
-		;~ else
-		;~ break
-	;~ }
 	
 	loop
 	{
-		;If we haven't reached the bottom of the page yet 
-		if(A_Index < MaxRows)
+		if(A_Index < MaxRows)			;If we haven't reached the bottom of the page yet 
 		{
 			if(bIsBlank(s,A_Index))
 			{
@@ -534,7 +457,7 @@ FindBlankCell(s)
 			mouseclick,Left,2050,940	;replace this with the control click when you get the control name
 			if(!bBottomofTable())
 			{
-				if(bIsBlank(s,(A_Index - (A_Index - MaxRows))))
+				if(bIsBlank(s, MaxRows ))
 				{
 					return A_Index - MaxRows
 					break
@@ -543,14 +466,15 @@ FindBlankCell(s)
 		}		
 	}
 }
-Select(s,l=1)
+Select(s,l=1)		;This has mostly depreciated into just for the table as anything with a field uses Get()
 {
 	if(s == "Quantity" or s == "Description" or s == "Class" or s == "Weight" or s == "HM")
-	MouseClick, left, %s%Pos[1] , %s%Pos[2] + (17 * (l - 1))
+		MouseClick, left, %s%Pos[1] , %s%Pos[2] + (17 * (l - 1))
 	else
-	MouseClick, Left, %s%Pos[1], %s%Pos[2]
-	;~ ControlFocus,%s%Field,Brain
-	sleep 10
+		ControlFocus,% %s%Field,A
+	
+	if(s == "Consignee")
+		CloseSearch()
 }
 SelectMany(x1,y1,x2,y2)
 {
@@ -574,12 +498,12 @@ Terms(n) ;This never seems to work, fix later
 {
 	Select("Terms")
 	Send %n%{Enter}
-	;ControlSetText, %TermsField%, %n%, brain
+	;ControlSetText, %TermsField%, %n%,A
 }
 Shipper(n="")
 {
 	Select("Shipper")
-	;~ ControlFocus,%ShipperField%,Brain
+	;~ ControlFocus,%ShipperField%,A
 	if(n)		;if I specified a specific account enter it
 	{
 		Delete()
@@ -676,7 +600,7 @@ REF(S="",x=0,y=0) ;Rarely used.
 }
 Quote(x,y) ;since the program doesn't auto complete quotes, these have to be entered by clicking
 {
-	controlfocus,%QuoteField%,Brain
+	controlfocus,%QuoteField%,A
 	Delete()
 	PixelSearch,Px,Py,x,y,x+30,y+30,0x000000,2,Fast
 	MouseClick,left,%Px%,%Py%,15
@@ -712,9 +636,9 @@ Weight(line,weight)
 TotalPieces(n) ;This works maybe 50% of the time, depends on the bill
 {
 
-	controlsend,%TotalPiecesField%,^{BackSpace},Brain
+	controlsend,%TotalPiecesField%,^{BackSpace},A
 	sleep 250
-	controlsend,%TotalPiecesField%,%n%,Brain
+	controlsend,%TotalPiecesField%,%n%,A
 	;~ set("TotalPieces",n)
 }
 
@@ -726,10 +650,9 @@ AddItem(line = 1,quantity = "",description = "",class = "",weight = "")
 	Weight(line,weight)
 }
 
-;still wip
-AddCode(code, line = "")
+AddCode(code, line = "")	;enter the code on the specified line or find a blank cell
 {
-	;enter the code on the specified line or find a blank cell
+
 	if(line)
 		Class(line,code)
 	else
@@ -739,10 +662,10 @@ AddCode(code, line = "")
 	
 }
 
-#include test.ahk
 #include 039.ahk
 #include 048.ahk
 #include 100.ahk
+#include OmniMacros.ahk
 
 
 ::000d::
@@ -752,11 +675,11 @@ AddCode(code, line = "")
 		Shipper()
 	else
 	{
-		Controlsend,%ShipperNameField%,"Duplicate",Brain
-		Controlsend,%ShipperStreet1Field%,"Duplicate",Brain
-		Controlsend,%ShipperCityField%,"Cookeville",Brain
-		Controlsend,%ShipperStateField%,"TN",Brain
-		Controlsend,%ShipperZipField%,38501,Brain
+		Controlsend,%ShipperNameField%,"Duplicate",A
+		Controlsend,%ShipperStreet1Field%,"Duplicate",A
+		Controlsend,%ShipperCityField%,"Cookeville",A
+		Controlsend,%ShipperStateField%,"TN",A
+		Controlsend,%ShipperZipField%,38501,A
 	}
 	closeSearch()
 	
@@ -765,11 +688,11 @@ AddCode(code, line = "")
 	else
 	{
 		mouseclick,left,1245,273
-		Controlsend,%ConsigneeNameField%,Duplicate,Brain
-		Controlsend,%ConsigneeStreet1Field%,Duplicate,Brain
-		Controlsend,%ConsigneeCityField%,Livingston,Brain
-		Controlsend,%ConsigneeStateField%,TN,Brain
-		Controlsend,%ConsigneeZipField%,38570,Brain
+		Controlsend,%ConsigneeNameField%,Duplicate,A
+		Controlsend,%ConsigneeStreet1Field%,Duplicate,A
+		Controlsend,%ConsigneeCityField%,Livingston,A
+		Controlsend,%ConsigneeStateField%,TN,A
+		Controlsend,%ConsigneeZipField%,38570,A
 	}	
 
 	Thirdparty()

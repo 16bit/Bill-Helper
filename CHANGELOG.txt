@@ -2,6 +2,25 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.0.2] - 2015-2-4
+### Watch For
+- Shipper not accepting text because of ControlSetText
+- Select or Delete Consignee not closing search
+- Select not working on any fields because of new ControlFocus
+- Control Delay 0 breaking macros
+
+### Added
+- Moved all OmniMacros to their own file
+- Default Control, Key, and Mouse Delays to 0
+
+### Changed
+- Changed all controls titles from Brain, to active window
+- Set() now uses ControlSetText
+- Find blank cell uses MaxRows as line for any bottom rows
+- Select uses ControlFocus for non table fields
+- Deleted all test.ahk macros and unincluded it.
+
+
 
 ## [0.0.1] - 2015-2-3
 ### Added
@@ -29,5 +48,7 @@ All notable changes to this project will be documented in this file.
 - Main
 	Deleted ControlFocus from Set()
 		Was messing up macros putting everything in Shipper
+
+
 
 [0.0.1]commit https://github.com/16bit/Bill-Helper/commit/9bac09e31ebb2d227c3920d80607d67423381b2d
