@@ -29,3 +29,5 @@ All notable changes to this project will be documented in this file.
 - Main
 	Deleted ControlFocus from Set()
 		Was messing up macros putting everything in Shipper
+
+[0.0.1]commit https://github.com/16bit/Bill-Helper/commit/9bac09e31ebb2d227c3920d80607d67423381b2d

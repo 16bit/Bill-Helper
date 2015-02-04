@@ -44,6 +44,7 @@ global QuoteField := "CdrFieldEdit42"
 global HUField := "CdrFieldEdit58"
 global TotalPiecesField := "CdrFieldEdit12"
 global TotalWeightField := "CdrFieldEdit13"
+global TermsField := "#3277020"
 
 
 global TermsPos := [1200,120]
@@ -100,16 +101,12 @@ return
 ;~ BLANKTABLE(7)
 ;~ AddItem(1,ASKUSER("QUANTITY"),"SHEETS PILLOW CASES",100,COPY("TOTALWEIGHT"))
 ;~ AddItem(1,COPY("HU"),"NEWSPAPER",150,COPY("TOTALWEIGHT"))
-s := "Shipper"
-x := 1358514
+controlclick,"SftTreeControl32_U7",Brain,,left
 
-sleep 500
-ControlSend,% %s%Field,^{BackSpace},Brain
-ControlSend,% %s%Field,%x%,Brain
 return
 
 ^M::
-SLEEP 250
+SLEEP 500
 IF(get("Shipper") = 1051382)
 	048L()
 
@@ -131,7 +128,7 @@ IF(get("Shipper") = 1070067)
 IF(get("Shipper") = 0932392)
 	048Medical()
 
-IF(get("Shipper") = 0714361)
+IF(get("Shipper") = 0714361 || get("Shipper") = 0396949)
 	048CUI()
 
 IF(get("Shipper") = 0235682)
@@ -210,9 +207,8 @@ Get(s)
 {
 	if(s != "BOL" or s != "PO" or s != "REF" or s != "Quantity" or s != "Description" or s != "Class" or s != "Weight")
 	{
-		ControlFocus,% %s%Field,Brain
 		ControlGetText,OutputVar,% %s%Field,Brain
-		return %OutputVar%		
+		return OutputVar
 	}
 }
 
@@ -220,7 +216,6 @@ Set(s,x)
 {
 	if(s != "BOL" or s != "PO" or s != "REF" or s != "Quantity" or s != "Description" or s != "Class" or s != "Weight")
 	{
-		ControlFocus,% %s%Field,Brain
 		ControlSend,% %s%Field,^{BackSpace},Brain
 		ControlSend,% %s%Field,%x%,Brain
 	}
@@ -554,7 +549,7 @@ Select(s,l=1)
 	MouseClick, left, %s%Pos[1] , %s%Pos[2] + (17 * (l - 1))
 	else
 	MouseClick, Left, %s%Pos[1], %s%Pos[2]
-	;ControlFocus,%s%Field,Brain
+	;~ ControlFocus,%s%Field,Brain
 	sleep 10
 }
 SelectMany(x1,y1,x2,y2)
@@ -583,13 +578,13 @@ Terms(n) ;This never seems to work, fix later
 }
 Shipper(n="")
 {
-	;~ Select("Shipper")
-	
+	Select("Shipper")
+	;~ ControlFocus,%ShipperField%,Brain
 	if(n)		;if I specified a specific account enter it
 	{
-		;~ Delete()
-		;~ Send %n%
-		Set("Shipper",n)
+		Delete()
+		Send %n%
+		;~ Set("Shipper",n)
 	}
 	
 	if(!bIsBlank("Shipper"))				;If there is something in the shipper field
