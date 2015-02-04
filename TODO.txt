@@ -1,3 +1,5 @@
 Make Clear() clear everything using isBlank
 
 ? Does close search need a wait timer
+
+* Totalpieces don't always delete the number already in the field

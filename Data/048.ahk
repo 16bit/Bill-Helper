@@ -227,7 +227,8 @@ return
 {
 	Send Prepaid{enter}
 	Shipper(0994681)
-	closeSearch()
+	;~ closeSearch()
+	Consignee()
 	ThirdParty(0499400)
 	;~ SignedFor(ASKUSER("SIGNED FOR:"))
 	SIGNEDFOR(COPY("TOTALPIECES")"PT")
@@ -248,7 +249,8 @@ return
 {
 	Send Prepaid{enter}
 	Shipper(0932392)
-	closeSearch()
+	;~ closeSearch()
+	Consignee()
 	ThirdParty()
 
 	SIGNEDFOR(COPY("TOTALPIECES")"PL")
@@ -258,7 +260,7 @@ return
 	
 	PO(,200,345)
 
-	Description(1,"Medical Products and / or coated")
+	Description(1,"MEDICAL PRODUCTS AND / OR COATED")
 	Class(1,150)
 	Weight(1,Get("TotalWeight"))
 	
@@ -268,17 +270,17 @@ return
 		DeleteLine()
 	}
 	
-InputBox,callinput,Time,Call?,,200,125
-	if(callinput)
-	{
-		AddCode(%callinput%)
-		if(callinput == "appt" or callinput == "call24" or callinput == "call48" or callinput == "call72" or callinput == "cbd")
-		{
-			sleep 200
-			InputBox,phonedesc,Phone,Phone?,,200,125
-			Description(FindBlankCell("Description"),%phonedesc%)
-		}		
-	}
+;~ InputBox,callinput,Time,Call?,,200,125
+	;~ if(callinput)
+	;~ {
+		;~ AddCode(%callinput%)
+		;~ if(callinput == "appt" or callinput == "call24" or callinput == "call48" or callinput == "call72" or callinput == "cbd")
+		;~ {
+			;~ sleep 200
+			;~ InputBox,phonedesc,Phone,Phone?,,200,125
+			;~ Description(FindBlankCell("Description"),%phonedesc%)
+		;~ }		
+	;~ }
 
 	TotalPieces(CalculateTotalPieces())
 	Select("Consignee")

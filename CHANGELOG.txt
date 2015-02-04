@@ -1,0 +1,31 @@
+# Change Log
+All notable changes to this project will be documented in this file.
+
+
+
+## [0.0.1] - 2015-2-3
+### Added
+- (039)	Created 039Trane() function for the easy trane bill
+- (Main)Control variable for Terms
+
+### Changed
+- 039Trane()
+	Commented out old ifBlank Consignee and entered Consignee()
+- 039TraneAberdeen()
+	Commented out old ifBlank Consignee and entered Consignee()
+- 039Ruskin()
+	Commented out old ifBlank Consignee and entered Consignee()
+	Changed PO section to get many instead of previous ask user
+	No longer gets quantity from HU since there could be more than one line
+	Changed Weight from Copy() to Get()
+	Moved Name entry to line 3 because it covered second item some times
+
+- 048Esab()
+	Commented out closeSearch() and added Consignee()
+- 048Medical()
+	Commented out closeSearch() and added Consignee()
+	Commented out phone input box.  Doesn't need to be added often enough.
+
+- Main
+	Deleted ControlFocus from Set()
+		Was messing up macros putting everything in Shipper
