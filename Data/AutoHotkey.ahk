@@ -2,10 +2,10 @@ CoordMode,Mouse,Screen
 CoordMode,Pixel,Screen
 SendMode, Input
 
-SetControlDelay, 0
-SetKeyDelay, 0
-SetMouseDelay, 0
-SetDefaultMouseSpeed, 100
+SetControlDelay, 20
+;~ SetKeyDelay, 0
+;~ SetMouseDelay, 0
+;~ SetDefaultMouseSpeed, 100
 
 ;Get ready for a shit ton of variables
 global TestField := "WindowsForms10.EDIT.app.0.2bf8098_r13_ad18"
@@ -44,23 +44,15 @@ global SignedForField := "CdrFieldEdit43"
 global SuffixField :=
 global QuoteField := "CdrFieldEdit42"
 
+global BOLField := "CdrFieldEdit67"
+global POField := "CdrFieldEdit68"
+global REFField := "CdrFieldEdit69"
+global TableField := "CdrFieldEdit70"
+
 global HUField := "CdrFieldEdit58"
 global TotalPiecesField := "CdrFieldEdit12"
 global TotalWeightField := "CdrFieldEdit13"
-global TermsField := "#3277020"
 
-
-global TermsPos := [1200,120]
-
-global ShipperPos := [1190, 150]
-global ShipperWidth = 60
-global ConsigneePos := [1190, 280]
-global ConsgineeWidth = 60
-global ThirdPartyPos := [1190, 440]
-global ThirdPartyWidth = 60
-
-global SignedForPos := [1980,95]
-global SignedForWidth = 165
 
 global BOLPos := [1250,590]
 global BOLWidth = 100
@@ -79,9 +71,7 @@ global ClassWidth = 30
 global WeightPos := [1810,746]
 global WeightWidth = 40
 
-global HUPos := [1240,690]
-global TotalPiecesPos := [1385,690]
-global TotalWeightPos := [1568,690]
+
 global CalcWeightPos := [1800,690]
 
 global SuffixPos := [1840,120]
@@ -98,13 +88,24 @@ return
 Reload  ; assigns Ctrl Alt r to reload scripts
 return
 
-+^B::
-;~ BLANKTABLE(7)
-;~ AddItem(1,ASKUSER("QUANTITY"),"SHEETS PILLOW CASES",100,COPY("TOTALWEIGHT"))
-;~ AddItem(1,COPY("HU"),"NEWSPAPER",150,COPY("TOTALWEIGHT"))
-
-
+^p::
 return
+^1::
+return
++^B::
+
+SLEEP 500
+
+msgbox % GetTableField("BOL",3)
+return
+
+GetTableField(Name,Line=1)
+{
+	Select(Name,Line)
+	
+	ControlGetText,OutputVar,% %Name%Field,A
+	return OutputVar
+}
 
 #z::
 TotalPieces(CalculateTotalPieces())
@@ -119,7 +120,7 @@ addcode(ASKUSER("CODE?"))
 return
 
 ^q::
-controlfocus, %QuoteField%,A
+ControlFocus, %QuoteField%,A
 return
 
 
@@ -132,11 +133,11 @@ CloseSearch(T=0.35)
 
 DeleteLine(l = 1)
 {
-	send +^{D %l%}
+	SendEvent +^{D %l%}
 }
 AddLine(l = 1)
 {
-	send +^{A %l%}
+	SendEvent +^{A %l%}
 }
 Clear(S)
 {
@@ -164,10 +165,18 @@ Set(s,x)
 {
 	if(s != "BOL" or s != "PO" or s != "REF" or s != "Quantity" or s != "Description" or s != "Class" or s != "Weight")
 	{
-		;~ ControlFocus,% %s%Field,A
-		;~ ControlSend,% %s%Field,^{BackSpace},Brain
-		;~ ControlSend,% %s%Field,%x%,A
-		ControlSetText,% %s%Field, %x%,A
+		ControlFocus,% %s%Field,A
+		ControlSend,% %s%Field,{END}{Shift Down}{HOME}{Shift Up}{DELETE}%x%,A
+	}
+}
+GetNearestPixel( ByRef Px , ByRef Py , X , Y , r , Color , var )
+{
+	r /= 2
+	PixelSearch,Px,Py, X-r , Y-r , X+r , Y+r , Color , var , Fast
+	if(Py)	;Adds an offset
+	{
+		Px += 3
+		Py += 3
 	}
 }
 
@@ -175,33 +184,31 @@ Copy(s="",l=1)
 {
 	clipboard=
 	if(s)
-	Select(s,l)
+		Select(s,l)
 	
 	Send {Home}+{End}^c
 	ClipWait,.25
 	
 	if(s == "Consignee")
-	CloseSearch()
+		CloseSearch()
 	
 	return clipboard	
 }
 Delete(s="",l=1)
 {
 	if(s)
-	Select(s,l)
+		Select(s,l)
 	
-	Send ^{Backspace}
+	Send ^{BackSpace}
 	
 	if(s == "Consignee")
-	CloseSearch()
+		CloseSearch()
 }
-bStringInCell(string,s="",l=1)
+IsInString(string,s="",l=1)
 {
-	if(s)
-		Select(s,l)
-	Copy()	
+	Field := Get(s)
 	
-	IfInString, Clipboard, %string%
+	IfInString, Field, %string%
 		return true
 	else
 		return false
@@ -216,6 +223,53 @@ CleanUpCell(line)
 	Send ^{Del}
 }
 
+;~ FindAddress(string)
+;~ {	
+	;~ AddressFound = false
+	;~ if(string)
+	;~ {
+		;~ Loop, read, AddressBook.csv
+		;~ {
+			;~ IfInString,A_LoopReadLine,%string%
+			;~ {		 
+				;~ Loop, parse, A_LoopReadLine, CSV
+					;~ stringParse%A_Index% = %A_Loopfield%		;This assigns each value seperated by a comma into an array
+				
+				;~ MsgBox, 4,, %stringParse1%`n%stringParse2%`n%stringParse3%`n%stringParse4%`n%stringParse6% %stringParse7% %stringParse5%`n%stringParse8%
+				;~ IfMsgBox, Yes
+					;~ AddressFound = true
+				;~ IfMsgBox, No
+					;~ continue
+				
+				;~ Select("Consignee")
+				;~ Loop, parse, A_LoopReadLine, CSV
+				;~ {
+					;~ if A_Index = 1		;if the current field is the account number
+						;~ CloseSearch()
+					;~ else
+						;~ Delete()
+					
+					;~ send %A_LoopField%
+					
+					;~ if A_Index = 2
+						;~ send {Tab 2} 	;if we are at the Name part of the consignee, press tab twice to skip the plant field
+					;~ else
+						;~ send {Tab}
+				;~ }
+				;~ break ;This should break out if  address was found
+			;~ }
+		;~ }
+		
+		;~ if AddressFound = false
+		;~ {	
+			
+			;~ MsgBox, 4, , Couldn't find an account at %string% boss, want to add it?
+			;~ IfMsgBox, Yes
+				;~ AddAddress()			
+		;~ }
+	;~ }
+;~ }
+
 FindAddress(string)
 {	
 	AddressFound = false
@@ -226,47 +280,56 @@ FindAddress(string)
 			IfInString,A_LoopReadLine,%string%
 			{		 
 				Loop, parse, A_LoopReadLine, CSV
-				stringParse%A_Index% = %A_Loopfield%		;This assigns each value seperated by a comma into an array
+					stringParse%A_Index% = %A_Loopfield%		;This assigns each value seperated by a comma into an array
 				
 				MsgBox, 4,, %stringParse1%`n%stringParse2%`n%stringParse3%`n%stringParse4%`n%stringParse6% %stringParse7% %stringParse5%`n%stringParse8%
 				IfMsgBox, Yes
-					AddressFound = true
+					{
+						AddressFound = true
+						if(stringParse1)
+						{
+							Consignee(stringParse1)
+							CloseSearch()
+							break
+						}
+						else
+						{
+							if(stringParse2)
+								Set("ConsigneeName",stringParse2)
+							if(stringParse3)
+								Set("ConsigneeStreet1",stringParse3)
+							if(stringParse4)
+								Set("ConsigneeStreet2",stringParse4)
+							if(stringParse6)
+								Set("ConsigneeCity",stringParse6)
+							if(stringParse7)
+								Set("ConsigneeState",stringParse7)
+							if(stringParse5)
+								Set("ConsigneeZip",stringParse5)
+							if(stringParse8)
+								Set("ConsigneePhone",stringParse8)
+						}
+						break
+					}
 				IfMsgBox, No
 					continue
-				
-				Select("Consignee")
-				CloseSearch()
-				Loop, parse, A_LoopReadLine, CSV
-				{
-					if A_Index = 1		;if the current field is the account number
-						CloseSearch()
-					else
-						Delete()
-					
-					send %A_LoopField%
-					
-					if A_Index = 2
-						send {Tab 2} 	;if we are at the Name part of the consignee, press tab twice to skip the plant field
-					else
-						send {Tab}
-				}
-				break ;This should break out if  address was found
 			}
 		}
 		
 		if AddressFound = false
 		{	
 			
-			MsgBox, 4, , Couldn't find an account at %string% boss, want to add it?
-			IfMsgBox, Yes
-				AddAddress()			
+			MsgBox, 4, , Couldn't find an account at %string% boss, want to add it? 'nThis is currently broken so its going to do nothing.
+			;~ IfMsgBox, Yes
+				;~ AddAddress()	
 		}
 	}
 }
+
+
 AddAddress()
 {	
 	Select("Consignee")
-	CloseSearch(0.35)
 	
 	Loop, 8
 	{
@@ -274,7 +337,6 @@ AddAddress()
 		
 		if A_Index = 1
 		{
-			CloseSearch(0.35)
 			FileAppend,
 			(
 			`n%Clipboard%,
@@ -323,8 +385,8 @@ Verify(s,n,l=1)
 	OldString := Copy()
 
 	;Gets rid of spaces
-	StringReplace, NewStr,OldString, %A_SPACE%, , All	
-
+	StringReplace, NewStr , OldString , %A_SPACE%, , All
+	
 	if(NewStr)
 	{
 		if(StrLen(NewStr) < n)		;If String is less than n characters long
@@ -332,7 +394,7 @@ Verify(s,n,l=1)
 			InputBox,input,Replace Field,%NewStr% looks a little small,,200,125,,,,,%NewStr%
 			if ErrorLevel = 0
 			if(input)
-			NewStr := input
+				NewStr := input
 		}
 	}
 	
@@ -438,7 +500,7 @@ bBottomofTable()	;Does a pixel search of the number column on the table, if it i
 FindBlankCell(s)
 {
 	MaxRows = 12 		;Number of rows on a single page, should always be 12 unless an update changes it.
-	Select(s)
+	;~ Select(s)
 
 	AddLine(1)
 	
@@ -468,13 +530,10 @@ FindBlankCell(s)
 }
 Select(s,l=1)		;This has mostly depreciated into just for the table as anything with a field uses Get()
 {
-	if(s == "Quantity" or s == "Description" or s == "Class" or s == "Weight" or s == "HM")
+	if(s == "BOL" or s == "PO" or s == "REF" or s == "Quantity" or s == "Description" or s == "Class" or s == "Weight" or s == "HM")
 		MouseClick, left, %s%Pos[1] , %s%Pos[2] + (17 * (l - 1))
 	else
 		ControlFocus,% %s%Field,A
-	
-	if(s == "Consignee")
-		CloseSearch()
 }
 SelectMany(x1,y1,x2,y2)
 {
@@ -494,69 +553,63 @@ InsertColumn(x,y)
 	SendMode INPUT
 }
 
-Terms(n) ;This never seems to work, fix later
+Terms(String) ;This only works on non hotstrings
 {
 	Select("Terms")
-	Send %n%{Enter}
-	;ControlSetText, %TermsField%, %n%,A
-}
-Shipper(n="")
-{
-	Select("Shipper")
-	;~ ControlFocus,%ShipperField%,A
-	if(n)		;if I specified a specific account enter it
-	{
-		Delete()
-		Send %n%
-		;~ Set("Shipper",n)
-	}
+	if(String == "Prepaid" or String == "P")
+		String := "P"
+	if(String == "Collect" or String == "C")
+		String := "C"
 	
-	if(!bIsBlank("Shipper"))				;If there is something in the shipper field
-	{
-		If(!bIsBlank("Consignee"))		;If the Consignee isn't blank, hit enter
-			Send {Enter}	
-		else											;Else make sure you close the search window that will pop up
-			Send {Enter}
-			CloseSearch()	
-	}
+	set("Terms",string)
+	SEND {ENTER}
 }
-Consignee(n="")
+Shipper(n)
+{
+			Select("Shipper")
+	
+	if(get("Shipper") != n)		;if the shipper number is not the same as n, enter n
+		Set("Shipper",n)
+
+
+	If(bIsBlank("Consignee"))		;If the Consignee is blank close the search window
+	{
+		Send {Enter}	
+		CloseSearch()	
+	}
+	else
+		Send {Enter}
+}
+Consignee(Number="")
 {
 	Select("Consignee")
-	closesearch()
 	
-	if(n)		;if I specified a specific account enter it
-	{
-		Delete()
-		Send %n%
+	if(Number)											;if we entered text to override
+		Set("Consignee",Number)
+	
+	if(!bIsBlank("Consignee"))		;if we enter the text or if there already is a value hit enter, else do nothing
 		Send {Enter}
-	}	
-	
-	else		;If I didn't specify an account and there is already an account pulled in.
-	{
-		if(!bIsBlank("Consignee"))
-			Send {Enter}	
-	}
 }
-ThirdParty(n="")
+ThirdParty(Number="")
 {
-	Select("ThirdParty")
+	Select("ThirdParty")	
 	
-	if(n)
-	{
-		Delete()
-		Send %n%
-	}
-	Send {Enter}
+	if(Number)
+		Set("ThirdParty",Number)
+	
+	if(!bIsBlank("ThirdParty"))		
+		Send {Enter}
 }
-SignedFor(S) ;no problems
+SignedFor(String) ;no problems
 {
 	Select("SignedFor")
-	Delete()
-	IF(S)
-		Send %s%{Enter}
+	If(String)
+		set("SignedFor",String)
+
 	else
-		SEND NS {ENTER}
+		set("SignedFor","NS")
+	
+	send {enter}
 }
 BOL(S="",x=0,y=0) ; this works most of the time, problems usually arise with numbers not being in the same spot most of the time
 {
@@ -570,8 +623,8 @@ BOL(S="",x=0,y=0) ; this works most of the time, problems usually arise with num
 	;or click on the document
 	Else
 	{
-		PixelSearch,Px,Py,x,y,x+40,y+40,0x000000,2,Fast
-		MouseClick,left,%Px%,%Py%,15
+		GetNearestPixel( Px , Py , x , y , 10 , 0x000000 , 10 )
+		MouseClick,left,Px,Py,15
 	}
 }
 PO(S="",x=0,y=0) ; see BOL()
@@ -582,8 +635,8 @@ PO(S="",x=0,y=0) ; see BOL()
 		Send %s%{Enter}
 	Else
 	{
-		PixelSearch,Px,Py,x,y,x+30,y+30,0x000000,2,Fast
-		MouseClick,left,%Px%,%Py%,15
+		GetNearestPixel( Px , Py , x , y , 10 , 0x000000 , 10 )
+		MouseClick,left,Px,Py,15
 	}
 }
 REF(S="",x=0,y=0) ;Rarely used.
@@ -594,16 +647,17 @@ REF(S="",x=0,y=0) ;Rarely used.
 		Send %s%{Enter}
 	Else
 	{
-		PixelSearch,Px,Py,x,y,x+30,y+30,0x000000,2,Fast
-		MouseClick,left,%Px%,%Py%,15
+		GetNearestPixel( Px , Py , x , y , 10 , 0x000000 , 10 )
+		MouseClick,left,Px,Py,15
 	}
 }
 Quote(x,y) ;since the program doesn't auto complete quotes, these have to be entered by clicking
 {
 	controlfocus,%QuoteField%,A
 	Delete()
-	PixelSearch,Px,Py,x,y,x+30,y+30,0x000000,2,Fast
-	MouseClick,left,%Px%,%Py%,15
+	GetNearestPixel( Px , Py , x , y , 30 , 0x000000 , 2 )
+	;~ PixelSearch,Px,Py,x,y,x+30,y+30,0x000000,2,Fast
+	MouseClick,left,Px,Py,15
 }
 
 Quantity(line,quantity)
@@ -633,13 +687,13 @@ Weight(line,weight)
 	If(clipboard == weight)
 	Select("CalcWeight")
 }
-TotalPieces(n) ;This works maybe 50% of the time, depends on the bill
+TotalPieces(Number) ;CONTROLSETTEXT DOES NOT WORK ON THIS
 {
-
-	controlsend,%TotalPiecesField%,^{BackSpace},A
-	sleep 250
-	controlsend,%TotalPiecesField%,%n%,A
-	;~ set("TotalPieces",n)
+	SELECT("tOTALpIECES")
+	SEND {END}+{HOME}{DELETE}
+	SLEEP 50
+	controlsend,%TotalPiecesField%,%Number%,A
+	;~ set("TotalPieces",Number)
 }
 
 AddItem(line = 1,quantity = "",description = "",class = "",weight = "")
@@ -658,51 +712,53 @@ AddCode(code, line = "")	;enter the code on the specified line or find a blank c
 	else
 		Class(FindBlankCell("Class"),code)
 
-	send {down}
+	send {ENTER}
 	
 }
 
+#include BuildAPI.ahk
 #include 039.ahk
 #include 048.ahk
 #include 100.ahk
 #include OmniMacros.ahk
+#include Select.ahk
 
+;~ #r::
+;~ BuildUserAhkApi("\\App\AutoHotkey\SciTE\user\user.ahk.api")
+;~ return
 
-::000d::
+;~ ::000d::
 
-	Send Prepaid{enter}
-	if(!bIsBlank("Shipper"))
-		Shipper()
-	else
-	{
-		Controlsend,%ShipperNameField%,"Duplicate",A
-		Controlsend,%ShipperStreet1Field%,"Duplicate",A
-		Controlsend,%ShipperCityField%,"Cookeville",A
-		Controlsend,%ShipperStateField%,"TN",A
-		Controlsend,%ShipperZipField%,38501,A
-	}
-	closeSearch()
+	;~ Send Prepaid{enter}
+	;~ if(!bIsBlank("Shipper"))
+		;~ Shipper()
+	;~ else
+	;~ {
+		;~ Controlsend,%ShipperNameField%,"Duplicate",A
+		;~ Controlsend,%ShipperStreet1Field%,"Duplicate",A
+		;~ Controlsend,%ShipperCityField%,"Cookeville",A
+		;~ Controlsend,%ShipperStateField%,"TN",A
+		;~ Controlsend,%ShipperZipField%,38501,A
+	;~ }
+	;~ closeSearch()
 	
-	if(!bIsBlank("Consignee"))
-		Consignee()
-	else
-	{
-		mouseclick,left,1245,273
-		Controlsend,%ConsigneeNameField%,Duplicate,A
-		Controlsend,%ConsigneeStreet1Field%,Duplicate,A
-		Controlsend,%ConsigneeCityField%,Livingston,A
-		Controlsend,%ConsigneeStateField%,TN,A
-		Controlsend,%ConsigneeZipField%,38570,A
-	}	
+	;~ if(!bIsBlank("Consignee"))
+		;~ Consignee()
+	;~ else
+	;~ {
+		;~ mouseclick,left,1245,273
+		;~ Controlsend,%ConsigneeNameField%,Duplicate,A
+		;~ Controlsend,%ConsigneeStreet1Field%,Duplicate,A
+		;~ Controlsend,%ConsigneeCityField%,Livingston,A
+		;~ Controlsend,%ConsigneeStateField%,TN,A
+		;~ Controlsend,%ConsigneeZipField%,38570,A
+	;~ }	
 
-	Thirdparty()
-
-	SIGNEDFOR(COPY("TOTALPIECES")"PT")
-
-
-	BLANKTABLE(5)
-	SLEEP 250
-	AddItem(1,Copy("HU"),"DUPLICATE DUPLICATE DUPLICATE",150,COPY("TOTALWEIGHT"))
+	;~ Thirdparty()
+	;~ SIGNEDFOR(COPY("TOTALPIECES")"PT")
+	;~ BLANKTABLE(5)
+	;~ SLEEP 250
+	;~ AddItem(1,Get("HU"),"DUPLICATE DUPLICATE DUPLICATE",150,Get("TOTALWEIGHT"))
 
 
 

@@ -17,64 +17,56 @@ return
 
 100Innovative()
 {
-	Send Prepaid{Enter}
+	Terms("P")
 	
-	Shipper(0346627)
-	CloseSearch()
-	
-	consignee()
+	Shipper(0346627)	
+	Consignee()
 	ThirdParty()
-		
-	;~ SignedFor(AskUser("Signed For:"))
-	SIGNEDFOR(COPY("TOTALPIECES")"SK")
-		SLEEP 250
+
+	SIGNEDFOR(Get("TOTALPIECES")"SK")
+	sleep 100
 	Quote(430,447)
-	SLEEP 250
-	;VERIFY("QUOTE",7)
+	SLEEP 100
 
 	Clear("BOL")
 	PO(,700,445)
+	;~ VERIFY("PO",5)
 
-	AddCode("SW",4)
-	SLEEP 500
+	SLEEP 400
 	TotalPieces(CalculateTotalPieces())
 }
 
 100Air()
 {
-	Send Prepaid{Enter}
-	
+	Terms("Prepaid")
 	Shipper(0491138)
-	CloseSearch()
+	Consignee()
 	ThirdParty()
 	
-	;SignedFor(AskUser("Signed For:"))
-	SIGNEDFOR("AVRT SLC")
+	SignedFor("AVRT SLC")
 	
 	Clear("BOL")
-	BOL(0013)
+	BOL(001)
 	
 	Clear("PO")
 	PO(,700,280)
 	
-	;Clear("REF")
+	Clear("REF")
 	REF(,728,260)
-	;Verify("REF",6)
 	
 	BLANKTABLE(6)
-	SLEEP 500
-	AddItem(1,Copy("HU"),"DIFFUSERS",70,COPY("TOTALWEIGHT"))
+	AddItem(1,Get("HU"),"DIFFUSERS",70,Get("TOTALWEIGHT"))
 }
 
 100PARAGON()
 {
-	Send Prepaid{Enter}
+	Terms("P")
 	
 	Shipper(1358514)
-	;~ CloseSearch()
+	Consignee()
 	ThirdParty()
 	
-	SIGNEDFOR(Copy("HU") "SLC")
+	SignedFor(AskUser("SIGNED FOR:",Get("TOTALPIECES")"SK"))
 	
 	Clear("BOL")
 	BOL(,403,1036)
@@ -82,22 +74,20 @@ return
 	Clear("PO")
 	PO(,688,177)	
 	
-	BLANKTABLE(7)
+	BLANKTABLE(5)
 	SLEEP 500
-	AddItem(1,Copy("HU"),"PLASTIC STRETCH FILM",55,COPY("TOTALWEIGHT"))
+	AddItem(1,Get("HU"),"PLASTIC STRETCH FILM",55,Get("TOTALWEIGHT"))
 }
 
 100National()
 {
-	Send Prepaid{Enter}
+	Terms("P")
 	
 	Shipper(0589057)
-	Consignee()
-	
+	Consignee()	
 	ThirdParty()
 	
-	SignedFor(Copy("HU")"SK")
-	;~ Clear("Bol")
+	SignedFor(Get("HU")"SK")
 	BOL(AskUser("BOL?",Copy("BOL")))
 	
 	Clear("PO")
@@ -105,7 +95,7 @@ return
 	
 	BlankTable(5)
 	Sleep 500
-	AddItem(1,AskUser("Quantity:"),"WELD WIRE",50,Copy("TotalWeight"))
+	AddItem(1,AskUser("Quantity:"),"WELD WIRE",50,Get("TotalWeight"))
 	
 	SLEEP 500
 	TotalPieces(CalculateTotalPieces())
@@ -114,13 +104,12 @@ return
 
 100Stillwater()
 {
-	Send Prepaid{Enter}
-	
+	Terms("P")
 	Shipper(0591388)
 	Consignee()	
 	ThirdParty()
 	
-	SIGNEDFOR(COPY("TOTALPIECES")"SK")
+	SignedFor(AskUser("SIGNED FOR:",Get("TOTALPIECES")"SK"))
 
 	Clear("Bol")
 	BOL(,720,165)
@@ -129,10 +118,72 @@ return
 	;~ PO(,280,477)
 	
 	BlankTable(5)
-	Sleep 500
-	AddItem(1,AskUser("Quantity:"),"AUDIO PRODUCTS",100,Copy("TotalWeight"))
+	;~ Sleep 500
+	AddItem(1,AskUser("Quantity:"),"AUDIO PRODUCTS",100,Get("TotalWeight"))
 	
 	SLEEP 500
 	TotalPieces(CalculateTotalPieces())
 
 }
+
+100ContinentalIindustries()
+{
+	Terms("P")
+	
+	Shipper(0347940)
+	Consignee()
+	ThirdParty()
+	
+	SignedFor(Get("HU")"pl")
+	
+	Clear("BOL")	
+	BOL(,873,154)
+	
+	BlankTable(5)
+	AddItem(1,AskUser("Quantity:"),"FITTINGS N.O.I PLASTIC",70,Get("TotalWeight"))
+	
+	PO(AskUser("PO?"))
+	
+}
+
+100TulsaTube()
+{
+	Terms("P")
+	Shipper(0383280)	
+	Consignee()
+	ThirdParty()
+	
+	SignedFor(AskUser("SIGNED FOR:",Get("TOTALPIECES")))
+	
+	Clear("BOL")
+	;~ BOL(,675,103)
+	BOL(72)
+	
+	Clear("PO")
+	PO(,496,264)
+	
+	BlankTable(5)
+	AddItem(1,AskUser("Quantity:"),"PIPE",70,Get("TotalWeight"))
+	sleep 250
+	TotalPieces(CalculateTotalPieces())
+}
+
+100Carlisle()
+{
+	Terms("P")
+	
+	Shipper(1087842)
+	Consignee()
+	ThirdParty()
+	
+	SignedFor(AskUser("SIGNED FOR:"))
+	
+	Clear("BOL")
+	
+	BLANKTABLE(5)
+	AddItem(1,Get("HU"),"clutch facings",70,Get("TOTALWEIGHT"))
+	
+	BOL(AskUser("BOL?"))
+}
+
+

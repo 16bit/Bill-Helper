@@ -12,15 +12,10 @@ RETURN
 039Trane()		; this is the easy Trane bill
 {
 	Send Prepaid{ENTER}
+	sleep 100
 
-	Shipper(0352084)
-	;~ if(!bIsBlank("Consignee"))
-		;~ Send {Enter}
-		;MsgBox,4,, Hmm, no account here `nHit Okay when you are ready to continue
-		
+	Shipper(0352084)		
 	Consignee()
-
-
 	ThirdParty()
 
 	SignedFor("SLC")
@@ -38,29 +33,27 @@ RETURN
 	SLEEP 200
 	if(bIsBlank("Description"))
 	{
-		AddItem(1,AskUser("Quantity"),"ND",150,Copy("TotalWeight"))
+		AddItem(1,AskUser("Quantity"),"ND",150,Get("TotalWeight"))
 		AddItem(2,,,"NDBOL")
-
 	}
 	ELSE
 	{
 		Class(1,150)
-		Weight(1,Copy("TotalWeight"))
+		Weight(1,Get("TotalWeight"))
 	}
-	SLEEP 100
+	sleep 250
 	TotalPieces(CalculateTotalPieces())
 }
 
 039TraneAberdeen()
 {
-	Send Prepaid {Enter}
+	Terms("Prepaid")
 	Shipper(0352084)
-	;~ closesearch()
-	Consignee()
-	
+	Consignee()	
 	ThirdParty(0689377)
+	
 	SignedFor("SLC")
-	BOL(,230,233)
+	BOL("2N")
 	
 }
 
@@ -70,7 +63,8 @@ return
 
 039Ruskin()
 {
-Send Prepaid{ENTER}
+;~ Send Prepaid{ENTER}
+Terms("Prepaid")
 
 ;~ MsgBox, 4, , Is RUS?
 	;~ IfMsgBox yes		
@@ -103,7 +97,7 @@ Consignee()
 	;~ CloseSearch()
 
 ThirdParty()
-
+sleep 150
 SignedFor("SLC")
 BOL(003)
 Verify("BOL",8)
@@ -111,13 +105,14 @@ Verify("BOL",8)
 	Select("PO")
 	CLEAR("PO")
 ;~ PO(AskUser("PO?",Copy("PO")))
-SelectMany(190,620,418,704)
-
+;~ SelectMany(233,618,465,705)
+PO(,239,628)
+;~ VERIFY("PO",6)
 ;~ BLANKTABLE(5)
 ;AddItem(1,Copy("HU"),"DAMPERS SHUTTERS OR LOUVERS",70,COPY("TOTALWEIGHT"))
 ;~ Quantity(1,(Copy("HU")))
 Description(1,"DAMPERS SHUTTERS OR LOUVERS")
-Weight(1,Get("TotalWeight"))
+;~ Weight(1,Get("TotalWeight"))
 
 Description(3,AskUser("NAME"))
 

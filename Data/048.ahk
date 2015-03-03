@@ -5,24 +5,19 @@ return
 
 048CUI()
 {
-	Send Prepaid{Enter}
+	Terms("Prepaid")
 
 	Shipper(0714361)
-	if(bIsBlank("Consignee"))
-		CLOSESEARCH()
-	ELSE
-		Consignee()
-
+	Consignee()
 	ThirdParty()
 
 	SignedFor(AskUser("Signed For:"))
 	BOL(14)
-	SLEEP 100
 	VERIFY("bOL",6)
 
 	Select("PO")
 	DeleteLine(3)
-		SelectMany(235,320,448,368)
+	SelectMany(210,310,448,368)
 
 	CleanUpCell(1)
 
@@ -35,14 +30,14 @@ return
 
 
 ;VERY BETA
-;~ ::048ATT::
-;~ 048ATT()
-;~ return
+::048ATT::
+048ATT()
+return
 
-;~ 048ATT()
-;~ {
-	;~ Send COLLECT, {Enter}
-	;~ Shipper(1075816)
+048ATT()
+{
+	Terms("C")
+	Shipper(1075816)
 
 	;~ Select("Consignee")
 	;~ CloseSearch()
@@ -55,6 +50,7 @@ return
 	;~ }
 	;~ else
 	;~ {
+		;~ ; Add at and t to address string
 		;~ Select("Consignee")
 		;~ WinWaitActive, Consignee search, Search String,,3
 		;~ Send {Home}AT and T{Space}{Enter}
@@ -64,38 +60,42 @@ return
 		;~ WinWaitClose, Consignee search
 		;~ Send {Enter}
 	;~ }
+	Consignee()
 
-	;~ SignedFor(AskUser("Signed For:"))
+	SignedFor(AskUser("Signed For:"))
 
-	;~ BOL(AskUser("BOL"))
-	;~ PO(,150,582)
-	;~ Verify("PO",7)
+	BOL(AskUser("BOL"))
+	PO(,150,582)
+	Verify("PO",7)
 
 	;~ BlankTable(5)
 	;~ AddItem(1,Copy("HU"),"Batteries",70,Copy("TotalWeight"))
 	;~ AddItem(2,,,"DNDS")
 	;~ Select("BOL")
 	;~ DeleteLine(2)
-;~ }
+}
 
 ::048L::
 048L()
 return
 
-048L()
+048L()		;Update this to more readable format
 {
-	Send Prepaid{ENTER 2}
-	CloseSearch(0.35)
+	Terms("Prepaid")
+	Shipper(1051382)
+	
 	SEND {ENTER 5}
-	Select("ThirdParty")
-	Send {ENTER}
+	ThirdParty()
+	
 	SignedFor(AskUser("Signed For:"))
 
 	REF(,636,376)
-	SLEEP 100
+	;~ SLEEP 100
 	VERIFY("REF",12)
-	SEND {ENTER 2}
-	SELECT("CONSIGNEE")
+	;~ SEND {ENTER 2}
+	SEND ^{F2}
+
+
 }
 
 
@@ -105,13 +105,13 @@ return
 
 048Tempur()
 {
-	Send Prepaid{Enter}
+	Terms("P")
 	Shipper(1070067)		;aka tempur pedic
-	CloseSearch()
+	SLEEP 100
 
 	if(bIsBlank("Consignee"))
 	{		
-		ControlGetText,Phone,%ConsigneePhoneField%,Brain
+		Phone := Get("ConsigneePhone")
 		
 		;Did the bill pull in a phone number?
 		if(Phone)
@@ -148,23 +148,26 @@ return
 		Consignee()
 	
 	if(bisblank("Consignee"))
-		CONTROLFOCUS,%ConsigneeCityField%,Brain
+	{
+		CONTROLFOCUS,%ConsigneeCityField%,A
 		Send {Del}
+	}
 	
 	THIRDPARTY()
 
 
-	SignedFor("NS")
-	;~ SignedFor(AskUser("Signed For:"))
+	;~ SignedFor("NS")
+	SignedFor(AskUser("Signed For:","NS"))
 
 	Select("BOL")
 	DeleteLine(1)
-	SLEEP 1000
-	VERIFY("BOL",10)
-	Send {Enter}
+	;~ SLEEP 500
+	;~ VERIFY("BOL",10)
+	;~ Send {Enter}
 
-	DeleteLine(2)
+
 	Select("PO")
+		DeleteLine(2)
 		
 	Loop
 	{
@@ -199,22 +202,16 @@ InputBox,callinput,Time,Call?,,200,125
 		sleep 500
 		
 		InputBox,phonedesc,Phone,Phone?,,200,125
-		;~ DESCLINE := FindBlankCell("Description")
-		;~ send %phonedesc%
 		Description(FindBlankCell("Description"),phonedesc)
-		 ;~ Description(5,%phonedesc%)
 	}
 	
-	Select("HM")
+	Select("HM")		;Update this to find the x's using isblank
 	Loop,11
 	{
 		Delete()
 		Send {Down}
 	}
 	SLEEP 100
-	
-	;if there is a consignee account number in the box
-
 	
 	Select("Quantity")
 }
@@ -225,19 +222,15 @@ return
 
 048Esab()
 {
-	Send Prepaid{enter}
+	Terms("P")
 	Shipper(0994681)
-	;~ closeSearch()
 	Consignee()
-	ThirdParty(0499400)
-	;~ SignedFor(ASKUSER("SIGNED FOR:"))
-	SIGNEDFOR(COPY("TOTALPIECES")"PT")
-	Verify("Bol",4)
+	ThirdParty()
+	SignedFor(AskUser("SIGNED FOR:",Get("TOTALPIECES")"PT"))
+	;~ Verify("Bol",4)
 
 	BLANKTABLE(5)
-	AddItem(1,Copy("HU"),"WELDING BARS",50,COPY("TOTALWEIGHT"))
-
-	Select("Consignee")
+	AddItem(1,Get("HU"),"WELDING BARS",50,Get("TOTALWEIGHT"))
 }
 
 
@@ -247,17 +240,17 @@ return
 
 048Medical()
 {
-	Send Prepaid{enter}
+	Terms("Prepaid")
 	Shipper(0932392)
-	;~ closeSearch()
 	Consignee()
 	ThirdParty()
 
-	SIGNEDFOR(COPY("TOTALPIECES")"PL")
+	SignedFor(Get("TOTALPIECES")"PL")
 	
 	BOL(,820,265)
 	Verify("Bol",8)
 	
+
 	PO(,200,345)
 
 	Description(1,"MEDICAL PRODUCTS AND / OR COATED")
@@ -283,10 +276,10 @@ return
 	;~ }
 
 	TotalPieces(CalculateTotalPieces())
-	Select("Consignee")
+	;~ Select("Consignee")
 }
 
-048M()
+048M()		;This never seems to be used again
 {
 	Send prepaid{enter}
 	Shipper(1159624)
@@ -312,7 +305,7 @@ return
 	
 	BLANKTABLE(8)
 	SLEEP 250
-	AddItem(1,Copy("HU"),"TIRES",110,COPY("TOTALWEIGHT"))
+	AddItem(1,Get("HU"),"TIRES",110,Get("TOTALWEIGHT"))
 	sleep 250
 	AddCode("PSA")
 	AddCode("SLC")
@@ -321,13 +314,12 @@ return
 
 048Gap()
 {
-	Send Prepaid {Enter}
+	Terms("P")
 	Shipper(0339128)
-	closesearch()
 	Consignee()
 	ThirdParty()
 	
-	SignedFor(AskUser("Signed?"))
+	SignedFor(GET("HU")"TWC")
 	
 	Clear("BOL")
 	BOL(,290,538)
@@ -335,21 +327,112 @@ return
 	PO(,315,560)	
 
 	BlankTable(5)
-	AddItem(1,Copy("HU"),"Fluted Corrugated Forms",70,COPY("TOTALWEIGHT"))
+	AddItem(1,Get("HU"),"FLUTED CORRUGATED FORMS",70,Get("TOTALWEIGHT"))
 }
 
 048Lindstrom()
 {
-	Send Prepaid {Enter}
+	Terms("Prepaid")
 	Shipper(0235682)
 	Consignee()
 	ThirdParty()
 	
+	SignedFor(Get("TotalPieces")"PT")
+	;~ SignedFor(AskUser("SIGNED FOR:",Get("TOTALPIECES")"PT"))
+
 	Clear("BOL")
 	BOL(,748,155)
+	;~ Bol(000)
 	
 	BlankTable(5)
-	AddItem(1,Copy("HU"),"NUTS AND BOLTS",50,COPY("TOTALWEIGHT"))
+	AddItem(1,Get("HU"),"NUTS AND BOLTS",50,Get("TOTALWEIGHT"))
+	Select("PO")
 }
+
+048Frankische()
+{
+	Terms("C")
+	Shipper(0841927)
+	Consignee()
+	ThirdParty()
+
+	SignedFor(AskUser("Signed?"))
+
+	Clear("BOL")
+	BOL(,757,220)
+	
+	BlankTable(5)
+	AddItem(1,Get("HU"),"PLASTICS",150,Get("TOTALWEIGHT"))
+}
+
+048IEWC()
+{
+	Terms("C")
+	
+	Shipper(0639678)
+	
+	SignedFor(AskUser("SIGNED FOR:",Get("TOTALPIECES")"PT"))
+	
+	Clear("BOL")
+	BOL(,704,278)
+	
+	Clear("PO")
+	PO(,151,624)
+	
+
+	BlankTable(5)
+	AddItem(1,AskUser("Quantity:"),"INSULATED AND UNINSULATED WIRE AND CABLE",70,Get("TotalWeight"))
+	
+	
+}
+
+048Greenfield()
+{
+	Terms("P")
+	Shipper(0998714)
+	Consignee()
+	Thirdparty()
+	
+	SignedFor(AskUser("SIGNED FOR:",Get("TOTALPIECES")"SK"))
+	Clear("PO")
+	
+	Class := Copy("Class",1)
+			BlankTable(5)	
+	if(!class)
+	{
+		AddItem(1,Get("HU"),"PACKAGE TOOLS",AskUser("Class"),Get("TotalWeight"))
+	}
+	else
+	{
+		AddItem(1,Get("HU"),"PACKAGE TOOLS",Class,Get("TotalWeight"))
+	}
+	
+	sleep 200
+		AddCode("DNDS",2)
+		AddCode("RQAD",3)		
+}
+
+048Maillis()
+{
+	Terms("P")
+	Shipper(0717184)
+	Consignee()
+	Thirdparty()
+	
+	SignedFor(AskUser("SIGNED FOR:",Get("TOTALPIECES")"SLC"))
+	
+	Clear("BOL")
+	BOL(,825,200)
+	
+	Clear("PO")
+	sleep 250
+	Quote(250,566)
+	
+	BlankTable(5)
+	AddItem(1,Get("HU"),"plastic strapping",55,Get("TotalWeight"))
+	
+}
+
+
 
 
